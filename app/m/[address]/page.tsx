@@ -251,7 +251,7 @@ function MandatePage() {
           Run the <a href="https://www.npmjs.com/package/@chainwrit/mcp-server" className="text-accent hover:underline">Chainwrit MCP server</a> with
           this agent's key, and any MCP client can pay within this mandate. For Claude Desktop, open Settings → Developer → Edit Config and add
           this to <code className="font-mono text-xs">claude_desktop_config.json</code>, pointing <code className="font-mono text-xs">AGENT_KEYPAIR_PATH</code> at
-          the key file you downloaded. Needs Node.js 18+.
+          the key file you downloaded. Needs Node.js 22 (or 20.18+).
         </p>
         <pre className="overflow-x-auto rounded-lg border border-line bg-panel p-4 font-mono text-xs leading-relaxed">{mcpConfig}</pre>
       </div>
