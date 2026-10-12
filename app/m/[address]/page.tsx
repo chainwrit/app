@@ -110,11 +110,11 @@ function MandatePage() {
     {
       mcpServers: {
         chainwrit: {
-          command: "node",
-          args: ["/path/to/chainwrit/core/mcp-server/dist/index.js"],
+          command: "npx",
+          args: ["-y", "@chainwrit/mcp-server"],
           env: {
             RPC_URL: "https://api.devnet.solana.com",
-            AGENT_KEYPAIR_PATH: `/path/to/agent-${m.agent.toBase58().slice(0, 6)}.json`,
+            AGENT_KEYPAIR_PATH: `/absolute/path/to/agent-${m.agent.toBase58().slice(0, 6)}.json`,
             MANDATE: m.address.toBase58(),
           },
         },
@@ -248,8 +248,10 @@ function MandatePage() {
       <div>
         <h2 className="mb-3 text-sm font-medium uppercase tracking-wider text-muted">Connect an agent</h2>
         <p className="mb-3 text-sm text-muted">
-          Run the <a href="https://github.com/chainwrit/core#mcp-server" className="text-accent hover:underline">Chainwrit MCP server</a> with
-          this agent's key, and any MCP client can pay within this mandate. For Claude Desktop, add to <code className="font-mono text-xs">claude_desktop_config.json</code>:
+          Run the <a href="https://www.npmjs.com/package/@chainwrit/mcp-server" className="text-accent hover:underline">Chainwrit MCP server</a> with
+          this agent's key, and any MCP client can pay within this mandate. For Claude Desktop, open Settings → Developer → Edit Config and add
+          this to <code className="font-mono text-xs">claude_desktop_config.json</code>, pointing <code className="font-mono text-xs">AGENT_KEYPAIR_PATH</code> at
+          the key file you downloaded. Needs Node.js 18+.
         </p>
         <pre className="overflow-x-auto rounded-lg border border-line bg-panel p-4 font-mono text-xs leading-relaxed">{mcpConfig}</pre>
       </div>
