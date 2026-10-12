@@ -12,7 +12,7 @@ export default function Providers({ children }: { children: React.ReactNode }) {
   // Phantom is also listed explicitly so it shows up with an install link when
   // the browser hasn't exposed it, instead of an empty wallet list.
   const endpoint = useMemo(
-    () => (typeof window === "undefined" ? "http://localhost/api/rpc" : `${window.location.origin}/api/rpc`),
+    () => (typeof window === "undefined" ? "http://localhost/api/rpc" : `${window.location.origin}${process.env.NEXT_PUBLIC_BASE_PATH}/api/rpc`),
     [],
   );
   const wallets = useMemo(() => [new PhantomWalletAdapter()], []);

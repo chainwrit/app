@@ -2,7 +2,7 @@
 
 The product UI for [Chainwrit](https://github.com/chainwrit/core): connect a Solana wallet, create spending mandates for your AI agents, fund them, watch every payment (including the ones the program rejected), and revoke in one click.
 
-**Live:** https://chainwrit-app.vercel.app
+**Live:** https://chainwrit.com/app
 
 Runs on **devnet** with `dUSDC`, a test mint with no value. The program has not been audited.
 

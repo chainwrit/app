@@ -14,14 +14,14 @@ export default function Header() {
     <header className="flex items-center justify-between gap-4 py-5">
       <div className="flex items-center gap-3">
         <Link href="/">
-          <img src="/logo-lockup.svg" alt="Chainwrit" className="h-7 w-auto" />
+          <img src={`${process.env.NEXT_PUBLIC_BASE_PATH}/logo-lockup.svg`} alt="Chainwrit" className="h-7 w-auto" />
         </Link>
         <span className="rounded border border-line px-1.5 py-0.5 font-mono text-[10px] uppercase tracking-wider text-muted">
           devnet
         </span>
       </div>
       <div className="flex items-center gap-4">
-        <a href="https://chainwrit.vercel.app" className="hidden text-sm text-muted hover:text-fg sm:inline">
+        <a href="https://chainwrit.com" className="hidden text-sm text-muted hover:text-fg sm:inline">
           About
         </a>
         <WalletMultiButton />

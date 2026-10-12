@@ -35,7 +35,7 @@ export default function Balances({ onChange }: { onChange?: () => void }) {
     setBusy(true);
     setMsg(null);
     try {
-      const res = await fetch("/api/faucet", {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_PATH}/api/faucet`, {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({ address: publicKey.toBase58() }),
