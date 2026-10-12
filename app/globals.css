@@ -26,3 +26,20 @@ body {
   font-family: var(--font-mono);
   word-break: break-all;
 }
+
+.wallet-adapter-button {
+  font-family: var(--font-sans);
+  font-size: 14px;
+  height: 38px;
+  padding: 0 16px;
+  border-radius: 6px;
+  background: var(--color-accent);
+  color: #0b0c0e;
+}
+.wallet-adapter-button:not([disabled]):hover {
+  background: #b5dc3f;
+}
+.wallet-adapter-modal-wrapper {
+  background: var(--color-panel);
+  font-family: var(--font-sans);
+}
