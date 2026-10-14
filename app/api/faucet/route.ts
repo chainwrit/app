@@ -21,7 +21,7 @@ export const dynamic = "force-dynamic";
 
 const DUSDC = 25_000_000n; // 25 dUSDC
 const DECIMALS = 6;
-const SOL_TOP_UP = 0.02 * LAMPORTS_PER_SOL;
+const SOL_TOP_UP = 0.05 * LAMPORTS_PER_SOL;
 const COOLDOWN_MS = 10 * 60_000;
 
 // Demo limitation: in memory, per instance.
@@ -60,7 +60,7 @@ export async function POST(req: NextRequest) {
     createTransferCheckedInstruction(from, mint, ata, faucet.publicKey, DUSDC, DECIMALS),
   );
   const sol = await conn.getBalance(to);
-  const toppedUp = sol < 0.01 * LAMPORTS_PER_SOL;
+  const toppedUp = sol < 0.03 * LAMPORTS_PER_SOL;
   if (toppedUp) tx.add(SystemProgram.transfer({ fromPubkey: faucet.publicKey, toPubkey: to, lamports: SOL_TOP_UP }));
 
   try {

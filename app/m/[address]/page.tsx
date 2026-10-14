@@ -15,7 +15,7 @@ import {
   type MandateView,
 } from "@chainwrit/sdk";
 import MandateStatus, { mandateStatus } from "@/components/MandateStatus";
-import { DEMO_MERCHANT, SYMBOL, TxError, explorerAddr, explorerTx, fmt, parseAmount, sendAndConfirm, short } from "@/lib/chain";
+import { AGENT_SOL, AGENT_SOL_LOW, DEMO_MERCHANT, SYMBOL, TxError, explorerAddr, explorerTx, fmt, parseAmount, fundAgent, sendAndConfirm, short } from "@/lib/chain";
 
 const KIND: Record<ActivityEntry["kind"], { label: string; tone: string }> = {
   create: { label: "Created", tone: "text-muted" },
@@ -45,6 +45,7 @@ function MandatePage() {
 
   const [m, setM] = useState<MandateView | null>(null);
   const [activity, setActivity] = useState<ActivityEntry[] | null>(null);
+  const [agentSol, setAgentSol] = useState<number | null>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [amount, setAmount] = useState("5");
   const [busy, setBusy] = useState<string | null>(null);
@@ -61,6 +62,7 @@ function MandatePage() {
       const [view, act] = await Promise.all([fetchMandate(connection, key), fetchActivity(connection, key, 30)]);
       setM(view);
       setActivity(act);
+      setAgentSol(await connection.getBalance(view.agent));
       setLoadError(null);
     } catch (e: any) {
       setLoadError(e.message?.includes("Account does not exist") ? "No mandate at this address on devnet." : e.message);
@@ -81,13 +83,15 @@ function MandatePage() {
   const now = Date.now() / 1000;
   const resetsIn = Math.max(0, Math.ceil((m.windowResetsAt - now) / 3600));
 
-  async function act(kind: "deposit" | "withdraw" | "revoke") {
+  async function act(kind: "deposit" | "withdraw" | "revoke" | "fund") {
     if (!wallet.publicKey || !key) return;
     setResult(null);
     setBusy(kind);
     try {
       let ixs;
-      if (kind === "revoke") {
+      if (kind === "fund") {
+        ixs = [fundAgent(wallet.publicKey, m!.agent)];
+      } else if (kind === "revoke") {
         if (!confirm("Revoke this mandate? The agent will not be able to make any further payments. This cannot be undone.")) return;
         ixs = await buildRevoke(connection, wallet.publicKey, key);
       } else {
@@ -97,7 +101,7 @@ function MandatePage() {
           : await buildWithdraw(connection, wallet.publicKey, key, base);
       }
       const sig = await sendAndConfirm(connection, wallet, ixs);
-      setResult({ text: kind === "revoke" ? "Mandate revoked." : `${kind === "deposit" ? "Deposited" : "Withdrew"} ${amount} ${SYMBOL}.`, sig });
+      setResult({ text: kind === "fund" ? `Sent the agent ${AGENT_SOL / 1e9} SOL for fees.` : kind === "revoke" ? "Mandate revoked." : `${kind === "deposit" ? "Deposited" : "Withdrew"} ${amount} ${SYMBOL}.`, sig });
       await load();
     } catch (e: any) {
       setResult({ text: e.message, sig: e instanceof TxError ? e.signature : undefined, bad: true });
@@ -156,6 +160,17 @@ function MandatePage() {
         <div className="rounded-lg border border-line bg-panel p-4 text-sm">
           <div className="mb-2 text-xs uppercase tracking-wider text-muted">Agent</div>
           <a href={explorerAddr(m.agent.toBase58())} target="_blank" rel="noreferrer" className="addr text-xs hover:text-accent">{m.agent.toBase58()}</a>
+          {agentSol !== null && (
+            <div className={`mt-1 text-xs ${agentSol < AGENT_SOL_LOW ? "text-bad" : "text-muted"}`}>
+              Fee balance: {(agentSol / 1e9).toLocaleString(undefined, { maximumFractionDigits: 4 })} SOL
+              {agentSol < AGENT_SOL_LOW && " · too low, the agent can't pay transaction fees"}
+              {agentSol < AGENT_SOL_LOW && isOwner && (
+                <button onClick={() => act("fund")} disabled={!!busy} className="ml-2 rounded border border-line px-2 py-0.5 text-fg hover:border-muted disabled:opacity-50">
+                  {busy === "fund" ? "Confirm in your wallet…" : `Send ${AGENT_SOL / 1e9} SOL`}
+                </button>
+              )}
+            </div>
+          )}
           <div className="mb-2 mt-4 text-xs uppercase tracking-wider text-muted">Allowed merchants</div>
           {m.merchants.map((k) => (
             <a key={k.toBase58()} href={explorerAddr(k.toBase58())} target="_blank" rel="noreferrer" className="addr block text-xs text-ok hover:underline">

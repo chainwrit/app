@@ -1,4 +1,4 @@
-import { Connection, PublicKey, Transaction, TransactionInstruction } from "@solana/web3.js";
+import { Connection, LAMPORTS_PER_SOL, PublicKey, SystemProgram, Transaction, TransactionInstruction } from "@solana/web3.js";
 import type { WalletContextState } from "@solana/wallet-adapter-react";
 import { decodeError } from "@chainwrit/sdk";
 
@@ -6,6 +6,14 @@ export const MINT = new PublicKey(process.env.NEXT_PUBLIC_MINT ?? "FqLbwGWwNQ5PB
 export const DEMO_MERCHANT = process.env.NEXT_PUBLIC_DEMO_MERCHANT ?? "Aoy8Ufnrfm8ENuhrF7F3SfEfEmNa8S3xJgtf8TFh4RxD";
 export const DECIMALS = 6;
 export const SYMBOL = "dUSDC";
+
+// The agent signs and pays the fee for every payment, so it needs a little SOL
+// of its own. 0.01 SOL covers about 2,000 payments.
+export const AGENT_SOL = 0.01 * LAMPORTS_PER_SOL;
+export const AGENT_SOL_LOW = 0.001 * LAMPORTS_PER_SOL;
+
+export const fundAgent = (from: PublicKey, agent: PublicKey) =>
+  SystemProgram.transfer({ fromPubkey: from, toPubkey: agent, lamports: AGENT_SOL });
 
 export const explorerTx = (sig: string) => `https://explorer.solana.com/tx/${sig}?cluster=devnet`;
 export const explorerAddr = (a: string) => `https://explorer.solana.com/address/${a}?cluster=devnet`;

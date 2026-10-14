@@ -8,7 +8,7 @@ import { useWalletModal } from "@solana/wallet-adapter-react-ui";
 import { Keypair, PublicKey } from "@solana/web3.js";
 import { getAssociatedTokenAddressSync } from "@solana/spl-token";
 import { buildCreateMandate, mandatePda } from "@chainwrit/sdk";
-import { DEMO_MERCHANT, MINT, SYMBOL, TxError, explorerTx, parseAmount, sendAndConfirm } from "@/lib/chain";
+import { AGENT_SOL, AGENT_SOL_LOW, DEMO_MERCHANT, MINT, SYMBOL, TxError, explorerTx, fundAgent, parseAmount, sendAndConfirm } from "@/lib/chain";
 
 const input =
   "w-full rounded-md border border-line bg-bg px-3 py-2 text-sm outline-none placeholder:text-muted/60 focus:border-accent";
@@ -107,6 +107,7 @@ export default function NewMandate() {
         merchants: merchantKeys,
         deposit: dep,
       });
+      if ((await connection.getBalance(agentKey)) < AGENT_SOL_LOW) instructions.push(fundAgent(wallet.publicKey, agentKey));
       await sendAndConfirm(connection, wallet, instructions);
       router.push(`/m/${mandate.toBase58()}?created=1`);
     } catch (err: any) {
@@ -169,7 +170,10 @@ export default function NewMandate() {
           </Field>
         </div>
 
-        <Field label={`Initial deposit (${SYMBOL})`} hint="Optional. You can deposit or withdraw later.">
+        <Field
+          label={`Initial deposit (${SYMBOL})`}
+          hint={`Optional. You can deposit or withdraw later. The same transaction also sends the agent ${AGENT_SOL / 1e9} SOL for its transaction fees.`}
+        >
           <input className={input} inputMode="decimal" value={deposit} onChange={(e) => setDeposit(e.target.value)} />
         </Field>
 
